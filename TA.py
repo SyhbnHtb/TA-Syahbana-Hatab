@@ -5,7 +5,7 @@ from openpyxl import Workbook, load_workbook
 import pygame
 import os
 
-class Login_System:
+class Main_System:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title('Welcome to Sigma University')
@@ -361,4 +361,4 @@ class MajorSelection:
             # Close Window After Done
             self.window.destroy()
 
-Login_System()
+Main_System()
