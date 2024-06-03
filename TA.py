@@ -5,6 +5,8 @@ from openpyxl import Workbook, load_workbook
 import pygame
 import os
 
+# Modul yang digunakan modul 1(variabel),modul 2(condition),modul 3(loop),modul 4(function),modul 6(getter),modul 7(data stack),modul 8(GUI)
+
 class Main_System:
     def __init__(self):
         self.root = tk.Tk()
@@ -16,7 +18,7 @@ class Main_System:
         # Play Music
         pygame.init()
         pygame.mixer.init()
-        music = r"C:\Users\hatab\Downloads\getmogged.mp3"
+        music = r"C:\Users\hatab\Downloads\Y2meta.app - Undertale _Sans. Theme_ NITRO (Lo-Fi) Mini-Remix (128 kbps).mp3"
         if os.path.exists(music):
             try:
                 pygame.mixer.music.load(music)
@@ -27,8 +29,23 @@ class Main_System:
         else:
             messagebox.showwarning("Warning", "Music file not found. Music will not play.")
 
+        # Load the saved volume
+        self.load_volume()
         self.show_login_screen()
         self.root.mainloop()
+        
+    def load_volume(self):
+        if os.path.exists("volume.txt"):
+            with open("volume.txt", "r") as file:
+                volume = float(file.read().strip())
+                pygame.mixer.music.set_volume(volume)
+                self.current_volume = volume
+        else:
+            self.current_volume = 1.0  # Default volume
+
+    def save_volume(self, volume):
+        with open("volume.txt", "w") as file:
+            file.write(str(volume))
 
     def show_login_screen(self):
         self.clear_window()
@@ -107,25 +124,28 @@ class Main_System:
         volume_label = tk.Label(self.root, text="Volume", bg="white", fg="black", font=("Centaur", 10))
         volume_label.place(x=30, y=425)
 
-        self.volume_slider = tk.Scale(self.root, from_=0, to_=1, orient='horizontal', resolution=0.1, bg="white", command=self.set_volume)
+        self.volume_slider = tk.Scale(self.root, from_=0, to=1, orient='horizontal', resolution=0.1, bg="white", command=self.set_volume)
         
-        # Volume Max
-        self.volume_slider.set(1)
+        # Set initial volume
+        self.volume_slider.set(self.current_volume)
         self.volume_slider.place(x=5, y=445)
 
     def set_volume(self, val):
         volume = float(val)
         pygame.mixer.music.set_volume(volume)
+        self.save_volume(volume)
+        # Update current volume
+        self.current_volume = volume 
 
     def show_register_screen(self):
         self.clear_window()
 
         # Image
-        img_path = r"C:\Users\hatab\OneDrive\Pictures\Saved Pictures\Top G.png"
+        img_path = r"C:\Users\hatab\OneDrive\Pictures\Saved Pictures\Oppy.jpg"
         if os.path.exists(img_path):
-            imgTopG = Image.open(img_path)
-            self.imgTopG = ImageTk.PhotoImage(imgTopG)
-            tk.Label(self.root, image=self.imgTopG, bg="white").place(x=50, y=80)
+            imgOppy = Image.open(img_path)
+            self.imgOppy = ImageTk.PhotoImage(imgOppy)
+            tk.Label(self.root, image=self.imgOppy, bg="white").place(x=180, y=90)
         else:
             messagebox.showwarning("Warning", "Logo image not found. Image will not be displayed.")
 
@@ -212,6 +232,16 @@ class Main_System:
         # Sign In
         signin = tk.Button(self.register_frame, width=6, text="Sign In", command=self.show_login_screen, bg="White", fg="#57a1f8", cursor="hand2", border=0)
         signin.place(x=270, y=320)
+        
+        # Volume Control Slider
+        volume_label = tk.Label(self.root, text="Volume", bg="white", fg="black", font=("Centaur", 10))
+        volume_label.place(x=30, y=425)
+
+        self.volume_slider = tk.Scale(self.root, from_=0, to=1, orient='horizontal', resolution=0.1, bg="white", command=self.set_volume)
+        
+        # Set initial volume
+        self.volume_slider.set(self.current_volume)
+        self.volume_slider.place(x=5, y=445)
 
     def clear_window(self):
         for widget in self.root.winfo_children():
@@ -312,7 +342,8 @@ class MajorSelection:
         tk.Label(self.major_frame, bg="#FFFFFF", text="Nama : ",fg="#57a1f8", font=("Poetsen One", 15)).place(x=30, y=80)
         tk.Label(self.major_frame, bg="#FFFFFF", text="NIK : ",fg="#57a1f8", font=("Poetsen One", 15)).place(x=30, y=180)
         tk.Label(self.major_frame, bg="#FFFFFF", text="No Telp : ",fg="#57a1f8", font=("Poetsen One", 15)).place(x=30, y=280)
-        tk.Label(self.major_frame, bg="#FFFFFF", text="Jurusan : ",fg="#57a1f8", font=("Poetsen One", 15)).place(x=30, y=380)
+        tk.Label(self.major_frame, bg="#FFFFFF", text="Umur : ",fg="#57a1f8", font=("Poetsen One", 15)).place(x=30, y=380)
+        tk.Label(self.major_frame, bg="#FFFFFF", text="Jurusan : ",fg="#57a1f8", font=("Poetsen One", 15)).place(x=30, y=480)
 
         # Input Nama
         self.name = tk.StringVar()
@@ -320,7 +351,7 @@ class MajorSelection:
         
         # Underline Nama
         tk.Frame(self.major_frame, width=455, height=2, bg="black").place(x=145, y=107)
-
+        
         # Input NIK
         self.NoIK = tk.StringVar()
         tk.Entry(self.major_frame, width=40, textvariable=self.NoIK,border=0, font=("Poetsen One", 15)).place(x=150, y=180)
@@ -334,27 +365,38 @@ class MajorSelection:
         
         # Underline No Telp
         tk.Frame(self.major_frame, width=455, height=2, bg="black").place(x=145, y=307)
-
+        
+        # Input Age
+        self.age = tk.IntVar()
+        tk.Entry(self.major_frame, width=40, textvariable=self.age,border=0, font=("Poetsen One", 15),).place(x=150, y=380)
+        
+        # Underline age
+        tk.Frame(self.major_frame, width=455, height=2, bg="black").place(x=145, y=407)
+                
         # Option Jurusan
         self.Jurusan = tk.StringVar()
         OptionJurusan = ttk.Combobox(self.major_frame, width=39, font=("Poetsen One", 15), textvariable=self.Jurusan, state="readonly")
-        OptionJurusan.place(x=150, y=380)
+        OptionJurusan.place(x=150, y=480)
         OptionJurusan['values'] = ('Teknik Komputer', 'Teknik Mesin', 'Teknik Kimia', 'Teknik Industri', 'Teknik Sipil', 'Teknik Kapal', 'Teknik Lingkungan', 'PWK', 'Kedokteran', 'Hukum', 'Hubungan Internasional', 'Management', 'Business')
 
         # Tombol Pendaftaran
-        tk.Button(self.major_frame, width=20, pady=7, bg="#EB984E", command=self.Confirm_Major, text="Submit").place(x=160, y=480)
+        tk.Button(self.major_frame, width=20, pady=7, bg="#EB984E", command=self.Confirm_Major, text="Submit").place(x=160, y=550)
 
-        # Tombol Keluar
-        tk.Button(self.major_frame, width=20, pady=7, bg="Red", command=self.window.destroy, text="Exit").place(x=400, y=480)
+        # Tombol Keluars
+        tk.Button(self.major_frame, width=20, pady=7, bg="Red", command=self.window.destroy, text="Exit").place(x=400, y=550)
 
     def Confirm_Major(self):
-        if not all([self.name.get(), self.NoIK.get(), self.NoTelp.get()]):
+        if not all([self.name.get(), self.NoIK.get(), self.NoTelp.get(), self.age.get()]):
             messagebox.showerror(title="Data masih kosong", message="HARAP ISI DATA ANDA UNTUK MELANJUTKAN PEMILIHAN JURUSAN")
         elif not self.Jurusan.get():
             messagebox.showerror(title="PILIH JURUSAN!", message="HARAP PILIH JURUSAN UNTUK MELANJUTKAN PEMILIHAN JURUSAN")
+        elif self.age.get() <18 :
+            messagebox.showerror(title="UMUR TIDAK MENCUKUPI!", message="UMUR ANDA TIDAK MENCUKUPI")
+        elif self.age.get() >26 :
+            messagebox.showerror(title="UMUR TIDAK MEMENUHI SYARAT!", message="UMUR ANDA TIDAK MEMENUHI SYARAT")
         else:
             # Write Excel
-            self.ws.append([self.name.get(), self.NoIK.get(), self.NoTelp.get(), self.Jurusan.get()])
+            self.ws.append([self.name.get(), self.NoIK.get(), self.NoTelp.get(), self.Jurusan.get(), self.age.get()])
             self.wb.save("data.xlsx")  # Save the Excel file
             messagebox.showinfo(title=f"Selamat {self.name.get()} anda sudah terdaftar", message=f"Anda telah memilih jurusan {self.Jurusan.get()}")
             
